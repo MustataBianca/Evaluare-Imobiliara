@@ -82,7 +82,7 @@ if submitted:
         st.markdown(f"### Prețul Estimat al Apartamentului este:")
         st.markdown(f"**{pret_estimat:,.0f} EURO**")
 
-        st.info("Rețineți: Această estimare este bazată pe un model antrenat pe doar 19 proprietăți. Rezultatele sunt stabile, dar marja de eroare poate fi mare.")
+        st.info("Rețineți: Această estimare este bazată pe un model antrenat pe doar 50 proprietăți. Rezultatele sunt stabile, dar marja de eroare poate fi mare.")
         
     except Exception as e:
         st.error(f"Eroare la estimare: {e}")
