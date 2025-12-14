@@ -47,3 +47,4 @@ print(f"Număr de rânduri în antrenare: {A_final.shape[0]}")
 print(f"Număr de coeficienți calculați: {A_final.shape[1]}")
 print("\nComparație Preț Real vs. Estimat:")
 print(rezultate_df.to_markdown(index=False, numalign="left", stralign="left"))
+
