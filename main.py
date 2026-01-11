@@ -8,7 +8,7 @@ from implementare import data, b, test, b_test
 df_train = pd.DataFrame(data)
 df_test = pd.DataFrame(test)
 
-AN_CURENT = 2025
+AN_CURENT = 2026
 for df_temp in [df_train, df_test]:
     df_temp['Varsta'] = AN_CURENT - df_temp['An_construire']
     df_temp.drop('An_construire', axis=1, inplace=True)
