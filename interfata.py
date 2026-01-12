@@ -86,3 +86,5 @@ if submitted:
         
     except Exception as e:
         st.error(f"Eroare la estimare: {e}")
+
+        #python -m streamlit run interfata.py
