@@ -88,5 +88,17 @@ rezultate_df = pd.DataFrame({
     'Eroare %': eroare_procentuala
 })
 
-pd.options.display.float_format = '{:,.2f}%'.format
-print(rezultate_df.to_string(index=False))
+nr_randuri_antrenare = A_final.shape[0]
+nr_coloane_antrenare = A_final.shape[1]
+print(f"Număr de rânduri în antrenare: {nr_randuri_antrenare}")
+print(f"Număr de trăsături (features + constanta): {nr_coloane_antrenare}")
+print("-" * 30)
+
+pd.reset_option('display.float_format')
+df_print = rezultate_df.copy()
+df_print['Pret Real'] = df_print['Pret Real'].map('{:,.0f}'.format)
+df_print['Pret Estimat'] = df_print['Pret Estimat'].map('{:,.0f}'.format)
+df_print['Eroare Absoluta'] = df_print['Eroare Absoluta'].map('{:,.0f}'.format)
+df_print['Eroare %'] = df_print['Eroare %'].map('{:,.2f}%'.format)
+
+print(df_print.to_string(index=False))

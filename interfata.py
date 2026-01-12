@@ -6,14 +6,14 @@ from sklearn.linear_model import Ridge
 from implementare import data, b, test, b_test
 
 
-# Re-executarea logicii de pre-procesare din main.py
+# re-executarea logicii de pre-procesare din main
 AN_CURENT = 2025
 df_train = pd.DataFrame(data)
 df_train['Varsta'] = AN_CURENT - df_train['An_construire']
 df_train.drop('An_construire', axis=1, inplace=True)
 COLOANE_MODEL = df_train.columns.tolist() 
 
-# Scalare și Antrenare Model Ridge (CMMP Stabilizat)
+# scalare si antrenare model ridge (CMMP Stabilizat)
 scaler = StandardScaler()
 A_scaled = scaler.fit_transform(df_train)
 intercept_A = np.ones((A_scaled.shape[0], 1))
@@ -30,18 +30,17 @@ def predict_price(input_data):
     input_df = input_data[COLOANE_MODEL] 
     X_scaled = scaler.transform(input_df)
     
-    # Adaugă Interceptul și face predicția
+    # adaugă interceptul si face predictia
     X_final = np.hstack((np.ones((1, 1)), X_scaled))
     pret_estimat = model.predict(X_final)[0]
     
     return pret_estimat
-
-# Interfata
+# interfata
 st.set_page_config(layout="centered")
 st.title("Estimator de Preț Apartament (Model CMMP Stabilizat)")
 st.markdown("Introduceți detaliile apartamentului dorit pentru a obține un preț estimativ.")
 
-# Crearea câmpurilor de intrare
+# crearea campurilor de intrare
 with st.form("predictie_form"):
     st.header("Detalii Apartament")
     
@@ -62,7 +61,7 @@ with st.form("predictie_form"):
     
     submitted = st.form_submit_button("Estimează Prețul")
 
-# Logica de predicție
+# logica de predictie
 if submitted:
     input_data = pd.DataFrame({
         'Suprafata_mp': [suprafata],
@@ -82,7 +81,7 @@ if submitted:
         st.markdown(f"### Prețul Estimat al Apartamentului este:")
         st.markdown(f"**{pret_estimat:,.0f} EURO**")
 
-        st.info("Rețineți: Această estimare este bazată pe un model antrenat pe doar 50 proprietăți. Rezultatele sunt stabile, dar marja de eroare poate fi mare.")
+        st.info("Rețineți: Această estimare este bazată pe un model antrenat pe doar 100 proprietăți. Rezultatele sunt stabile, dar marja de eroare poate fi mare.")
         
     except Exception as e:
         st.error(f"Eroare la estimare: {e}")
