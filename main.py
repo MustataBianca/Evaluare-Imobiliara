@@ -3,14 +3,11 @@ import pandas as pd
 from implementare import data, b, test, b_test
 
 def scale_data(train_df, test_df):
-    # calculeaza media si deviatia standard pentru fiecare coloana.
+    # (x - medie) / deviație_standard  scaleaza criteriile pentru a avea un impact proportional
     means = train_df.mean()
     stds = train_df.std()
-    
-    # (x - medie) / deviatie_standard
     train_scaled = (train_df - means) / stds
     test_scaled = (test_df - means) / stds
-    
     return train_scaled.to_numpy(), test_scaled.to_numpy()
 
 def tort(A_in):
@@ -20,20 +17,21 @@ def tort(A_in):
     U = np.zeros((m, n)) 
     beta = np.zeros(n)
 
-    for k in range(p): 
+    for k in range(p):
         sigma = np.sign(A[k, k]) * np.sqrt(np.sum(A[k:m, k]**2))
+        
         if sigma == 0:
             beta[k] = 0 
         else:
             U[k, k] = A[k, k] + sigma
             U[k+1:m, k] = A[k+1:m, k]
             beta[k] = sigma * U[k, k]
-
-            # actualizarea coloanei k în A
+            
+            # Actualizarea coloanei k in A
             A[k, k] = -sigma
-            A[k+1:m, k] = 0 
-
-            # actualizarea coloanelor j = k+1:n 
+            A[k+1:m, k] = 0
+            
+            # Aplicarea transformarii pe restul coloanelor
             for j in range(k + 1, n):
                 tau = np.dot(U[k:m, k], A[k:m, j]) / beta[k]
                 A[k:m, j] = A[k:m, j] - tau * U[k:m, k]
@@ -42,22 +40,22 @@ def tort(A_in):
 
 def cmmp(A, b_vec):
     m, n = A.shape
-    R_full, U, beta = tort(A) 
+    R_full, U, beta = tort(A)
     
+    # Calculul vectorului d care suprascrie b
     d = b_vec.copy().astype(float)
-    for k in range(n): 
+    for k in range(n):
         if beta[k] != 0:
-            tau = np.dot(U[k:m, k], d[k:m]) / beta[k] 
-            d[k:m] = d[k:m] - tau * U[k:m, k] 
+            tau = np.dot(U[k:m, k], d[k:m]) / beta[k]
+            d[k:m] = d[k:m] - tau * U[k:m, k]
     
+    # UTRIS
     R_prime = R_full[:n, :n]
     d_prime = d[:n]
-    
     x = np.zeros(n)
     for i in range(n - 1, -1, -1):
         suma = np.dot(R_prime[i, i + 1:], x[i + 1:])
         x[i] = (d_prime[i] - suma) / R_prime[i, i]
-        
     return x
 
 df_train = pd.DataFrame(data)
@@ -69,36 +67,28 @@ for df in [df_train, df_test]:
     df.drop('An_construire', axis=1, inplace=True)
 
 A_scaled, T_scaled = scale_data(df_train, df_test)
-
-# adaugare coloana de 1 pentru constanta modelului
 A_final = np.hstack((np.ones((A_scaled.shape[0], 1)), A_scaled))
 T_final = np.hstack((np.ones((T_scaled.shape[0], 1)), T_scaled))
-coeficienti = cmmp(A_final, b)
 
-preturi_estimate = T_final @ coeficienti
+# CMMP manual
+coef_manual = cmmp(A_final, b)
+pred_manual = T_final @ coef_manual
 
-eroare_absoluta = np.abs(preturi_estimate - b_test)
-eroare_procentuala = (eroare_absoluta / b_test) * 100
+# numpy.linalg.lstsq care returnează soluție, reziduuri, rang, valori singulare
+coef_standard, _, _, _ = np.linalg.lstsq(A_final, b, rcond=None)
+pred_standard = T_final @ coef_standard
 
-rezultate_df = pd.DataFrame({
-    'ID Test': np.arange(len(b_test)) + 1,
+rezultate_complet = pd.DataFrame({
+    'ID': np.arange(len(b_test)) + 1,
     'Pret Real': b_test,
-    'Pret Estimat': preturi_estimate,
-    'Eroare Absoluta': eroare_absoluta,
-    'Eroare %': eroare_procentuala
+    'Estimat Manual': pred_manual,
+    'Estimat lstsq': pred_standard,
+    'Dif. Manual vs lstsq': pred_manual - pred_standard
 })
 
-nr_randuri_antrenare = A_final.shape[0]
-nr_coloane_antrenare = A_final.shape[1]
-print(f"Număr de rânduri în antrenare: {nr_randuri_antrenare}")
-print(f"Număr de trăsături (features + constanta): {nr_coloane_antrenare}")
-print("-" * 30)
+pd.options.display.float_format = '{:,.2f}'.format
+print("Comparatie CMMP: manual vs. lstsq")
+print(rezultate_complet.to_string(index=False))
 
-pd.reset_option('display.float_format')
-df_print = rezultate_df.copy()
-df_print['Pret Real'] = df_print['Pret Real'].map('{:,.0f}'.format)
-df_print['Pret Estimat'] = df_print['Pret Estimat'].map('{:,.0f}'.format)
-df_print['Eroare Absoluta'] = df_print['Eroare Absoluta'].map('{:,.0f}'.format)
-df_print['Eroare %'] = df_print['Eroare %'].map('{:,.2f}%'.format)
-
-print(df_print.to_string(index=False))
+eroare_metode = np.linalg.norm(coef_manual - coef_standard)
+print(f"\nDiferenta de eroare dintre cele doua metode: {eroare_metode:.2e}")
