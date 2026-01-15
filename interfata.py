@@ -78,7 +78,7 @@ with st.form("predictie_form"):
     
     col3, col4 = st.columns(2)
     distanta_centru = col3.number_input("Distanță Centru (km)", min_value=0.5, max_value=20.0, value=5.0)
-    an_construire = col4.slider("An Construire", 1950, 2026, 2000)
+    an_construire = col4.slider("An Construire", 1920, 2026, 2000)
     
     col5, col6 = st.columns(2)
     etaj = col5.number_input("Etaj", 0, 15, 3)
