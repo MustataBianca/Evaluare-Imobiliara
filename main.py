@@ -22,7 +22,7 @@ def tort(A_in):
         sigma = np.sign(A[k, k]) * np.sqrt(np.sum(A[k:m, k]**2))
         
         if sigma == 0:
-            beta[k] = 0 
+            beta[k] = 0     # factor normare
         else:
             U[k, k] = A[k, k] + sigma
             U[k+1:m, k] = A[k+1:m, k]

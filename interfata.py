@@ -102,9 +102,6 @@ if submitted:
         'Varsta': [AN_CURENT - an_construire]
     })
     
-    #  reordonare coloane
-    input_df = input_df[df_train.columns]
-    
     #  scalare folosind mediile de la antrenare
     X_scaled = scale_custom(input_df).to_numpy()
     X_final = np.hstack((np.ones((1, 1)), X_scaled))
