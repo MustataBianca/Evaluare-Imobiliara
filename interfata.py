@@ -106,7 +106,7 @@ if submitted:
     X_scaled = scale_custom(input_df).to_numpy()
     X_final = np.hstack((np.ones((1, 1)), X_scaled))
     
-    #  predicția reprezinta produsul scalar intre input si coeficientii calculati de cmmp
+    #  predictia reprezinta produsul scalar intre input si coeficientii calculati de cmmp
     pret_estimat = (X_final @ coeficienti)[0]
     
     st.success(f"Preț Estimat: {pret_estimat:,.0f} EURO")
